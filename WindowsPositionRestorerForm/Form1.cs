@@ -6,7 +6,7 @@ namespace WindowsPositionRestorerForm
 {
     public partial class Form1 : Form
     {
-        WindowPositionManager manager = new WindowPositionManager();
+        private readonly WindowPositionManager manager = new();
 
         public Form1()
         {
@@ -19,10 +19,17 @@ namespace WindowsPositionRestorerForm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void buttonSave_Click(object sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
-            manager.save();
-            messageArea.Text = "以下のウィンドウ情報を保存しました\r\n" + manager.fetchResults();
+            int windowCount = manager.FetchWindowCount();
+            progressBar1.Maximum = windowCount;
+            progressBar1.Minimum = 0;
+            progressBar1.Value = 0;
+            messageArea.Text = "";
+            this.Update();
+
+            manager.Save();
+            messageArea.Text = "以下のウィンドウ情報を保存しました\r\n" + manager.FetchResults();
         }
 
         /// <summary>
@@ -31,10 +38,10 @@ namespace WindowsPositionRestorerForm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void buttonRestore_Click(object sender, EventArgs e)
+        private void ButtonRestore_Click(object sender, EventArgs e)
         {
-            manager.restore();
-            messageArea.Text = "復元結果は以下の通りです\r\n" + manager.fetchResults();
+            manager.Restore();
+            messageArea.Text = "復元結果は以下の通りです\r\n" + manager.FetchResults();
         }
     }
 }

@@ -12,37 +12,80 @@ namespace WindowsPositionRestorerForm
         /// <summary>
         /// ロガー
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// EnumWindowsで列挙されるウィンドウの総数を格納する。進捗状況管理に用いる。
+        /// </summary>
+        private int enumWindowCount;
+
+        /// <summary>
+        /// 復元候補として保存されたウィンドウの総数を格納する。進捗状況管理に用いる。
+        /// </summary>
+        private int savedWindowCount;
+
         /// <summary>
         /// WindowPositionのコレクション
         /// </summary>
-        List<WindowPosition> listPosition = new List<WindowPosition>();
+        List<WindowPosition> listPosition = new();
 
         [DllImport("user32")]
         private static extern bool EnumWindows(WNDENUMPROC lpEnumFunc, IntPtr lParam);
         private delegate bool WNDENUMPROC(IntPtr hWnd, IntPtr lParam);
 
         /// <summary>
-        /// ウィンドウ一覧を取得、保存する
+        /// EnumWindowsで列挙されるウィンドウの数を取得する。
         /// </summary>
-        public void save()
+        /// <returns>EnumWindowsで列挙されるウィンドウの数</returns>
+        public int FetchWindowCount()
         {
-            listPosition = new List<WindowPosition>();
-
+            logger.Info("fetchWindowCount start.");
+            
+            enumWindowCount = 0;
             // ウィンドウごとにEnumerateWindowを実行する
-            EnumWindows(EnumerateWindow, IntPtr.Zero);
+            EnumWindows(EnumerateWindowForCount, IntPtr.Zero);
+            
+            logger.Info("fetchWindowCount term.");
+            return enumWindowCount;
+        }
+        /// <summary>
+        /// fetchWindowCount()で呼ぶEnumWindowsからのコールバック関数
+        /// ウィンドウの数を増分する。        
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        private bool EnumerateWindowForCount(IntPtr hWnd, IntPtr lParam)
+        {
+            enumWindowCount++;
+            return true;
         }
 
         /// <summary>
-        /// EnumWindowsからのコールバック関数
+        /// ウィンドウ一覧を取得、保存する
+        /// </summary>
+        public int Save()
+        {
+            logger.Info("save start.");
+            listPosition = new List<WindowPosition>();
+            savedWindowCount = 0;
+
+            // ウィンドウごとにEnumerateWindowを実行する
+            EnumWindows(EnumerateWindow, IntPtr.Zero);
+            logger.Info("save term.");
+            return savedWindowCount;
+        }
+
+        /// <summary>
+        /// save()で呼ぶEnumWindowsからのコールバック関数
         /// </summary>
         /// <param name="hWnd"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
         private bool EnumerateWindow(IntPtr hWnd, IntPtr lParam)
         {
-            saveWindowInfoIfRequired(hWnd);
+            SaveWindowInfoIfRequired(hWnd);
+            savedWindowCount++;
             return true;
         }
 
@@ -50,7 +93,7 @@ namespace WindowsPositionRestorerForm
         /// ウィンドウ情報を取得し、必要なら保存する
         /// </summary>
         /// <param name="hWnd"></param>
-        private void saveWindowInfoIfRequired(IntPtr hWnd)
+        private void SaveWindowInfoIfRequired(IntPtr hWnd)
         {
             // ウィンドウ情報取得・生成
             var windowPosition = new WindowPosition(hWnd);
@@ -60,36 +103,39 @@ namespace WindowsPositionRestorerForm
             {
                 listPosition.Add(windowPosition);
             }
-
         }
 
         /// <summary>
         /// 保存したウィンドウ情報と現在のウィンドウ情報を比較し、必要なら復元する
         /// </summary>
-        public void restore()
+        public void Restore()
         {
+            logger.Info("restore start.");
             // 実行結果のクリア
             listPosition.ForEach(x => x.result.Clear());
 
             // 保存しているウィンドウ位置情報ごとに、復元要否を判定して必要なら復元する
-            foreach (WindowPosition x in listPosition)
+            foreach (WindowPosition saved in listPosition)
             {
-                WindowPosition current = new WindowPosition(x.hWnd);
-                if (x.isToRestore(current))
+                WindowPosition current = new(saved.hWnd);
+                if (saved.isToRestore(current))
                 {
-                    x.restore();
+                    saved.restore();
                 }
             }
+            logger.Info("restore term.");
         }
 
         /// <summary>
         /// 保存しているウィンドウ情報を文字列で返す。
         /// </summary>
         /// <returns>保存しているウィンドウ情報の文字列</returns>
-        public string fetchResults()
+        public string FetchResults()
         {
-            List<string> listResult = new List<string>();
+            logger.Info("fetchResults start.");
+            List<string> listResult = new();
             listPosition.ForEach(x => listResult.Add(x.toStringForDisp()));
+            logger.Info("fetchResults term.");
             return String.Join("\r\n", listResult);
         }
     }
