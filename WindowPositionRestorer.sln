@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsPositionRestorerForm", "WindowsPositionRestorerForm\WindowsPositionRestorerForm.csproj", "{130F88C7-187E-432A-99F7-0B90EA5BAAFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowPositionRestorerForm", "WindowPositionRestorerForm\WindowPositionRestorerForm.csproj", "{130F88C7-187E-432A-99F7-0B90EA5BAAFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
