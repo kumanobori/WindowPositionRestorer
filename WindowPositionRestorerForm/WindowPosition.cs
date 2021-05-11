@@ -4,7 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using NLog;
 
-namespace WindowsPositionRestorerForm
+namespace WindowPositionRestorerForm
 {
     /// <summary>
     /// ウィンドウハンドルとウィンドウ位置情報を記憶し、復元するクラス。
@@ -133,7 +133,7 @@ namespace WindowsPositionRestorerForm
         /// <returns>画面表示用の文字列情報出力</returns>
         public string toStringForDisp()
         {
-            return $"{processName}:{windowText}:{result.ToString()}";
+            return $"【{processName}】【{windowText}】{result.ToString()}";
         }
         /// <summary>
         /// 復元対象として保存しておくべきかどうかを判定する
@@ -144,14 +144,14 @@ namespace WindowsPositionRestorerForm
             // 自分自身のウィンドウは復元対象外とする。理由は、復元ボタンを押した瞬間に移動されると戸惑うから。
             if (hWnd == Process.GetCurrentProcess().MainWindowHandle)
             {
-                logger.Debug("restorer itself is not target.");
+                logger.Debug("restorer itself is not target." + toString());
                 return false;
             }
 
             // 不可視ウィンドウは保存対象外とする
             if (!isVisible)
             {
-                logger.Debug("not to save because visible = false. " + toString());
+                logger.Trace("not to save because visible = false. " + toString());
                 return false;
             }
             // 位置情報がないウィンドウは保存対象外とする
@@ -163,9 +163,10 @@ namespace WindowsPositionRestorerForm
             // ウィンドウタイトルバー文字列がないウィンドウは保存対象外とする
             if (windowText.Equals(""))
             {
-                logger.Debug("not to save because windowText is blank.");
+                logger.Debug("not to save because windowText is blank." + toString());
                 return false;
             }
+            logger.Debug("save target." + toString());
             return true;
         }
 
@@ -200,28 +201,27 @@ namespace WindowsPositionRestorerForm
             if (processId != x.processId)
             {
                 logger.Debug($"not to restore: processId unmatch: {x.processId}");
-                result.Append("対象が見つかりませんでした。");
+                result.Append("→→→対象が見つかりませんでした。");
                 return false;
             }
             // プロセス名が異なっている場合、そのウィンドウハンドルは別物になったとみなし、復元対象外とする
             if (processName != x.processName)
             {
                 logger.Debug($"not to restore: processName unmatch: {x.processName}");
-                result.Append("対象が見つかりませんでした。");
+                result.Append("→→→対象が見つかりませんでした。");
                 return false;
             }
             // クラス名が異なっている場合、そのウィンドウハンドルは別物になったとみなし、復元対象外とする
             if (className != x.className)
             {
                 logger.Debug($"not to restore: className unmatch: {x.className}");
-                result.Append("対象が見つかりませんでした。");
+                result.Append("→→→対象が見つかりませんでした。");
                 return false;
             }
             // 位置情報に変動がなければ、復元不要
             if (left == x.left && top == x.top && right == x.right && bottom == x.bottom)
             {
                 logger.Debug($"not to restore: window not moved");
-                result.Append("");
                 return false;
             }
             return true;
@@ -255,14 +255,14 @@ namespace WindowsPositionRestorerForm
             bool ret = SetWindowPos(hWnd, HWND_NOTOPMOST, left, top, right - left, bottom - top, SWP_NOZORDER | SWP_NOACTIVATE);
             if (ret)
             {
-                var msg = "復元に成功しました。";
+                var msg = "→→→復元しました。";
                 result.Append(msg);
                 logger.Info(msg);
             }
             else
             {
                 var win32error = Marshal.GetLastWin32Error();
-                var msg = "復元に失敗しました。" + win32error;
+                var msg = "→→→復元に失敗しました。" + win32error;
                 result.Append(msg);
                 logger.Error(msg);
             }

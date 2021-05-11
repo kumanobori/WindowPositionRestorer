@@ -1,5 +1,5 @@
 ﻿
-namespace WindowsPositionRestorerForm
+namespace WindowPositionRestorerForm
 {
     partial class Form1
     {

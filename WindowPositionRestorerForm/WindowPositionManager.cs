@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using NLog;
-namespace WindowsPositionRestorerForm
+namespace WindowPositionRestorerForm
 {
     /// <summary>
     /// WindowPosisionの操作用クラス。
@@ -17,12 +17,27 @@ namespace WindowsPositionRestorerForm
         /// <summary>
         /// EnumWindowsで列挙されるウィンドウの総数を格納する。進捗状況管理に用いる。
         /// </summary>
-        private int enumWindowCount;
+        protected int enumWindowCount;
+
+        /// <summary>
+        /// EnumWindows列挙による処理のカウンタ
+        /// </summary>
+        protected int idxSave;
 
         /// <summary>
         /// 復元候補として保存されたウィンドウの総数を格納する。進捗状況管理に用いる。
         /// </summary>
-        private int savedWindowCount;
+        public int savedWindowCount;
+
+        /// <summary>
+        /// 復元処理のカウンタ
+        /// </summary>
+        protected int idxRestore;
+
+        /// <summary>
+        /// 保存日時
+        /// </summary>
+        public DateTime saved;
 
         /// <summary>
         /// WindowPositionのコレクション
@@ -37,19 +52,18 @@ namespace WindowsPositionRestorerForm
         /// EnumWindowsで列挙されるウィンドウの数を取得する。
         /// </summary>
         /// <returns>EnumWindowsで列挙されるウィンドウの数</returns>
-        public int FetchWindowCount()
+        public void SaveWindowCount()
         {
-            logger.Info("fetchWindowCount start.");
+            logger.Info("SaveWindowCount start.");
             
             enumWindowCount = 0;
             // ウィンドウごとにEnumerateWindowを実行する
             EnumWindows(EnumerateWindowForCount, IntPtr.Zero);
             
-            logger.Info("fetchWindowCount term.");
-            return enumWindowCount;
+            logger.Info($"SaveWindowCount term. WindowCont = {enumWindowCount}.");
         }
         /// <summary>
-        /// fetchWindowCount()で呼ぶEnumWindowsからのコールバック関数
+        /// SaveWindowCount()で呼ぶEnumWindowsからのコールバック関数
         /// ウィンドウの数を増分する。        
         /// </summary>
         /// <param name="hWnd"></param>
@@ -64,16 +78,24 @@ namespace WindowsPositionRestorerForm
         /// <summary>
         /// ウィンドウ一覧を取得、保存する
         /// </summary>
-        public int Save()
+        public virtual void Save()
         {
             logger.Info("save start.");
+
+            // ウィンドウ位置情報のコレクションをクリア
             listPosition = new List<WindowPosition>();
+            
+            // カウンタをクリア
             savedWindowCount = 0;
+            idxSave = 0;
 
             // ウィンドウごとにEnumerateWindowを実行する
             EnumWindows(EnumerateWindow, IntPtr.Zero);
+
+            // 保存日時を保存
+            saved = DateTime.Now;
+
             logger.Info("save term.");
-            return savedWindowCount;
         }
 
         /// <summary>
@@ -85,9 +107,16 @@ namespace WindowsPositionRestorerForm
         private bool EnumerateWindow(IntPtr hWnd, IntPtr lParam)
         {
             SaveWindowInfoIfRequired(hWnd);
-            savedWindowCount++;
+            idxSave++;
+            ProgressSave();
             return true;
         }
+
+        /// <summary>
+        /// Save()の進捗状況を更新する
+        /// </summary>
+        protected virtual void ProgressSave() { }
+
 
         /// <summary>
         /// ウィンドウ情報を取得し、必要なら保存する
@@ -102,15 +131,18 @@ namespace WindowsPositionRestorerForm
             if (windowPosition.isToSave())
             {
                 listPosition.Add(windowPosition);
+                savedWindowCount++;
             }
         }
 
         /// <summary>
         /// 保存したウィンドウ情報と現在のウィンドウ情報を比較し、必要なら復元する
         /// </summary>
-        public void Restore()
+        public virtual void Restore()
         {
             logger.Info("restore start.");
+            // カウンタのクリア
+            idxRestore = 0;
             // 実行結果のクリア
             listPosition.ForEach(x => x.result.Clear());
 
@@ -122,9 +154,17 @@ namespace WindowsPositionRestorerForm
                 {
                     saved.restore();
                 }
+                idxRestore++;
+                ProgressRestore();
             }
             logger.Info("restore term.");
         }
+
+        /// <summary>
+        /// Restore()の進捗状況を更新する
+        /// </summary>
+        protected virtual void ProgressRestore() { }
+
 
         /// <summary>
         /// 保存しているウィンドウ情報を文字列で返す。

@@ -2,15 +2,16 @@
 using System.Windows.Forms;
 using NLog;
 
-namespace WindowsPositionRestorerForm
+namespace WindowPositionRestorerForm
 {
     public partial class Form1 : Form
     {
-        private readonly WindowPositionManager manager = new();
+        private readonly WindowPositionManagerProgressBar manager;
 
         public Form1()
         {
             InitializeComponent();
+            manager = new WindowPositionManagerProgressBar(progressBar1);
         }
 
         /// <summary>
@@ -21,15 +22,14 @@ namespace WindowsPositionRestorerForm
         /// <param name="e"></param>
         private void ButtonSave_Click(object sender, EventArgs e)
         {
-            int windowCount = manager.FetchWindowCount();
-            progressBar1.Maximum = windowCount;
-            progressBar1.Minimum = 0;
-            progressBar1.Value = 0;
+            // 結果表示エリアをクリア
             messageArea.Text = "";
             this.Update();
 
+            manager.SaveWindowCount();
             manager.Save();
-            messageArea.Text = "以下のウィンドウ情報を保存しました\r\n" + manager.FetchResults();
+
+            messageArea.Text = $"[{manager.saved.ToString("MM/dd HH:mm")}] {manager.savedWindowCount} 件を復元候補として保存しました\r\n" + manager.FetchResults();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace WindowsPositionRestorerForm
         private void ButtonRestore_Click(object sender, EventArgs e)
         {
             manager.Restore();
-            messageArea.Text = "復元結果は以下の通りです\r\n" + manager.FetchResults();
+            messageArea.Text = $"[{manager.saved.ToString("MM/dd HH:mm")}] に保存した{manager.savedWindowCount}件を候補として、復元を試みました。プロセス情報の末尾に結果を追記します。ただし変化のなかったウィンドウについては何も追記しません。\r\n" + manager.FetchResults();
         }
     }
 }

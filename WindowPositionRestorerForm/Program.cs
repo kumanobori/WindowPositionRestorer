@@ -2,7 +2,7 @@ using System;
 using System.Windows.Forms;
 using NLog;
 
-namespace WindowsPositionRestorerForm
+namespace WindowPositionRestorerForm
 {
     static class Program
     {
