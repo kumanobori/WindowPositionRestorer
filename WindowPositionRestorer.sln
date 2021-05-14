@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowPositionRestorerForm", "WindowPositionRestorerForm\WindowPositionRestorerForm.csproj", "{130F88C7-187E-432A-99F7-0B90EA5BAAFB}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "Common\Common.shproj", "{C461253D-A2BE-4552-A7CE-AE00429CE2A5}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Common\Common.projitems*{130f88c7-187e-432a-99f7-0b90ea5baafb}*SharedItemsImports = 5
+		Common\Common.projitems*{c461253d-a2be-4552-a7ce-ae00429ce2a5}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
