@@ -9,6 +9,10 @@
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.7.9" />
   </ItemGroup>
@@ -18,5 +22,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Import Project="..\Common\Common.projitems" Label="Shared" />
 
 </Project>

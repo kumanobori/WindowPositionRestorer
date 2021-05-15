@@ -7,7 +7,7 @@ namespace WindowPositionRestorerForm
     /// <summary>
     /// WindowsPositionManagerを、プログレスバーで進捗状況を把握できるように拡張したクラス。
     /// </summary>
-    class WindowPositionManagerProgressBar : WindowPositionManager
+    public class WindowPositionManagerProgressBar : WindowPositionRestorerCommon.WindowPositionManager
     {
         /// <summary>
         /// ロガー
@@ -17,7 +17,7 @@ namespace WindowPositionRestorerForm
         /// <summary>
         /// プログレスバー
         /// </summary>
-        ProgressBar ProgressBar;
+        public ProgressBar ProgressBar;
 
         /// <summary>
         /// コンストラクタ
@@ -35,6 +35,7 @@ namespace WindowPositionRestorerForm
         /// </summary>
         public override void Save()
         {
+            base.SaveWindowCount();
             ProgressBar.Minimum = 0;
             ProgressBar.Maximum = enumWindowCount;
             ProgressBar.Value = 0;

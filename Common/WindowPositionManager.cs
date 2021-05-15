@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using NLog;
-namespace WindowPositionRestorerForm
+namespace WindowPositionRestorerCommon
 {
     /// <summary>
     /// WindowPosisionの操作用クラス。
     /// </summary>
-    class WindowPositionManager
+    public class WindowPositionManager
     {
         /// <summary>
         /// ロガー
@@ -69,7 +69,7 @@ namespace WindowPositionRestorerForm
         /// <param name="hWnd"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
-        private bool EnumerateWindowForCount(IntPtr hWnd, IntPtr lParam)
+        protected bool EnumerateWindowForCount(IntPtr hWnd, IntPtr lParam)
         {
             enumWindowCount++;
             return true;
@@ -128,7 +128,7 @@ namespace WindowPositionRestorerForm
             var windowPosition = new WindowPosition(hWnd);
 
             // 保存対象と判定したら保存
-            if (windowPosition.isToSave())
+            if (windowPosition.IsToSave())
             {
                 listPosition.Add(windowPosition);
                 savedWindowCount++;
@@ -150,9 +150,9 @@ namespace WindowPositionRestorerForm
             foreach (WindowPosition saved in listPosition)
             {
                 WindowPosition current = new(saved.hWnd);
-                if (saved.isToRestore(current))
+                if (saved.IsToRestore(current))
                 {
-                    saved.restore();
+                    saved.Restore();
                 }
                 idxRestore++;
                 ProgressRestore();
@@ -174,7 +174,7 @@ namespace WindowPositionRestorerForm
         {
             logger.Info("fetchResults start.");
             List<string> listResult = new();
-            listPosition.ForEach(x => listResult.Add(x.toStringForDisp()));
+            listPosition.ForEach(x => listResult.Add(x.ToStringForDisp()));
             logger.Info("fetchResults term.");
             return String.Join("\r\n", listResult);
         }
