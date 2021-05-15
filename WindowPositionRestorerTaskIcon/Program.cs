@@ -6,7 +6,7 @@ namespace WindowPositionRestorerTaskIcon
 {
     static class Program
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>

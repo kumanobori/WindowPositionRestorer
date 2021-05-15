@@ -128,7 +128,7 @@ namespace WindowPositionRestorerCommon
             var windowPosition = new WindowPosition(hWnd);
 
             // 保存対象と判定したら保存
-            if (windowPosition.isToSave())
+            if (windowPosition.IsToSave())
             {
                 listPosition.Add(windowPosition);
                 savedWindowCount++;
@@ -150,9 +150,9 @@ namespace WindowPositionRestorerCommon
             foreach (WindowPosition saved in listPosition)
             {
                 WindowPosition current = new(saved.hWnd);
-                if (saved.isToRestore(current))
+                if (saved.IsToRestore(current))
                 {
-                    saved.restore();
+                    saved.Restore();
                 }
                 idxRestore++;
                 ProgressRestore();
@@ -174,7 +174,7 @@ namespace WindowPositionRestorerCommon
         {
             logger.Info("fetchResults start.");
             List<string> listResult = new();
-            listPosition.ForEach(x => listResult.Add(x.toStringForDisp()));
+            listPosition.ForEach(x => listResult.Add(x.ToStringForDisp()));
             logger.Info("fetchResults term.");
             return String.Join("\r\n", listResult);
         }

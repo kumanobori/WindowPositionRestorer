@@ -55,7 +55,7 @@ namespace WindowPositionRestorerTaskIcon
             
             // フォームを閉じ、タスクトレイアイコンの表示を更新
             form.Close();
-            this.taskTrayIcon.Text = $"{TOOL_NAME}：{DateTime.Now.ToString("MM/dd HH:mm")} に {manager.savedWindowCount}件の候補を保存しました。";
+            this.taskTrayIcon.Text = $"{TOOL_NAME}：{DateTime.Now:MM/dd HH:mm} に {manager.savedWindowCount}件の候補を保存しました。";
         }
 
         /// <summary>
