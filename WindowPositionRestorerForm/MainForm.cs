@@ -26,7 +26,6 @@ namespace WindowPositionRestorerForm
             messageArea.Text = "";
             this.Update();
 
-            manager.SaveWindowCount();
             manager.Save();
 
             messageArea.Text = $"[{manager.saved.ToString("MM/dd HH:mm")}] {manager.savedWindowCount} 件を復元候補として保存しました\r\n" + manager.FetchResults();

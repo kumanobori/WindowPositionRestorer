@@ -4,7 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using NLog;
 
-namespace WindowPositionRestorerForm
+namespace WindowPositionRestorerCommon
 {
     /// <summary>
     /// ウィンドウハンドルとウィンドウ位置情報を記憶し、復元するクラス。

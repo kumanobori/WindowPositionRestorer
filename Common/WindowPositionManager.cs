@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using NLog;
-namespace WindowPositionRestorerForm
+namespace WindowPositionRestorerCommon
 {
     /// <summary>
     /// WindowPosisionの操作用クラス。
     /// </summary>
-    class WindowPositionManager
+    public class WindowPositionManager
     {
         /// <summary>
         /// ロガー
@@ -69,7 +69,7 @@ namespace WindowPositionRestorerForm
         /// <param name="hWnd"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
-        private bool EnumerateWindowForCount(IntPtr hWnd, IntPtr lParam)
+        protected bool EnumerateWindowForCount(IntPtr hWnd, IntPtr lParam)
         {
             enumWindowCount++;
             return true;
