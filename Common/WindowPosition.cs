@@ -12,6 +12,8 @@ namespace WindowPositionRestorerCommon
     class WindowPosition
     {
         [DllImport("user32", SetLastError = true)]
+        private static extern bool IsWindow(IntPtr hWnd);
+        [DllImport("user32", SetLastError = true)]
         private static extern bool IsWindowVisible(IntPtr hWnd);
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
@@ -28,6 +30,10 @@ namespace WindowPositionRestorerCommon
         /// ウィンドウハンドル
         /// </summary>
         public IntPtr hWnd;
+        /// <summary>
+        /// ウィンドウハンドルが有効であるか否か
+        /// </summary>
+        public bool isHwndValid;
         /// <summary>
         /// プロセスID
         /// </summary>
@@ -83,6 +89,13 @@ namespace WindowPositionRestorerCommon
         {
             // ウィンドウハンドルポインタ
             this.hWnd = hWnd;
+
+            // ウィンドウハンドルポインタが有効か否か。有効でない場合は以降の項目はセットできないのでここで止める。
+            this.isHwndValid = IsWindow(hWnd);
+            if (!isHwndValid)
+            {
+                return;
+            }
 
             // 可視・不可視
             isVisible = IsWindowVisible(hWnd);
@@ -217,21 +230,28 @@ namespace WindowPositionRestorerCommon
         /// <returns>復元されるべきであればtrue</returns>
         public Boolean IsToRestore(WindowPosition x)
         {
-            // プロセスIDが異なっている場合、そのウィンドウハンドルは別物になったとみなし、復元対象外とする
+            // ウィンドウハンドルが有効でない場合、ウィンドウが消えたとみなす
+            if (!x.isHwndValid)
+            {
+                logger.Debug($"not to restore: hWnd not found: {x.hWnd}");
+                result.Append("→→→対象ウィンドウが消えたようです。");
+                return false;
+            }
+            // プロセスIDが異なっている場合、そのウィンドウハンドルは別物になったとみなす
             if (processId != x.processId)
             {
                 logger.Debug($"not to restore: processId unmatch: {x.processId}");
                 result.Append("→→→対象が見つかりませんでした。");
                 return false;
             }
-            // プロセス名が異なっている場合、そのウィンドウハンドルは別物になったとみなし、復元対象外とする
+            // プロセス名が異なっている場合、そのウィンドウハンドルは別物になったとみなす
             if (processName != x.processName)
             {
                 logger.Debug($"not to restore: processName unmatch: {x.processName}");
                 result.Append("→→→対象が見つかりませんでした。");
                 return false;
             }
-            // クラス名が異なっている場合、そのウィンドウハンドルは別物になったとみなし、復元対象外とする
+            // クラス名が異なっている場合、そのウィンドウハンドルは別物になったとみなす
             if (className != x.className)
             {
                 logger.Debug($"not to restore: className unmatch: {x.className}");
